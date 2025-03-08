@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Sql;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace connectionclass
+{
+    class Class1
+    {
+        public static SqlConnection cn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|Datadirectory|\\Database1.mdf;Integrated Security=True");
+
+        public static string Login(string tblnm, string param)
+        {
+            string sql = "SELECT * FROM " + tblnm + " WHERE " + param;
+
+            SqlDataAdapter da = new SqlDataAdapter(sql, cn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            if (dt.Rows.Count == 1)
+            {
+                string active = dt.Rows[0][3].ToString();
+                if (active == "y")
+                {
+                    return "1";
+                }
+                else
+                {
+                    return "2";
+                }
+            }
+            else
+            {
+                return "3";
+            }
+
+            /*if (dt.Rows.Count > 0)
+            {
+                return dt.Rows[0][0].ToString(); 
+            }
+
+            return "No data found";
+            */
+        }
+    }
+}
+
