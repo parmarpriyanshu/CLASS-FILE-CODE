@@ -36,14 +36,6 @@ namespace connectionclass
             {
                 return "3";
             }
-
-            /*if (dt.Rows.Count > 0)
-            {
-                return dt.Rows[0][0].ToString(); 
-            }
-
-            return "No data found";
-            */
         }
     }
 }
