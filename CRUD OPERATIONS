@@ -1,0 +1,135 @@
+using System;
+using System.Data.SqlClient;
+using System.Data.Sql;
+using System.Data;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace newclassfile
+{
+    class Class1
+    {        
+        public static SqlConnection cn = new SqlConnection(@"Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True;User Instance=True");
+        public static int id,rp;
+        public static string Login(string tblnm, string param)
+        {
+            string sql = "SELECT * FROM " + tblnm + " WHERE " + param; 
+            SqlDataAdapter da = new SqlDataAdapter(sql, cn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            if (dt.Rows.Count == 1)
+            {
+                string active = dt.Rows[0][3].ToString();
+                if (active == "y")
+                {
+                    return "1";
+                }
+                else
+                {
+                    return "2";
+                }
+            }
+            else
+            {
+                return "3";
+            }
+        }
+
+
+        public static DataTable Crud(string qtype, string tblnm, string param = null)
+        {
+            DataTable dt = new DataTable();
+            SqlDataAdapter da;
+            if (qtype == "insert")
+            {
+                string sql = "INSERT INTO " + tblnm + " (Student_Name,Mobile_No) VALUES ('" + param + "')";
+                da = new SqlDataAdapter(sql, cn);
+                da.Fill(dt);
+                return dt;
+            }
+            if (qtype == "select")
+            {
+                string sql = "select * from " + tblnm;
+                da = new SqlDataAdapter(sql, cn);
+                da.Fill(dt);
+                id = Convert.ToInt32(dt.Rows[rp]["id"]);
+                return dt;
+            }
+            if (qtype == "update")
+            {
+                string sql = "UPDATE " + tblnm + " SET " + param;
+                SqlDataAdapter da1 = new SqlDataAdapter(sql, cn);
+                DataTable datatable = new DataTable();
+                da1.Fill(datatable);
+                return datatable;
+            }
+            return dt;
+        }
+        public class RecordNavigator
+        {
+            private SqlConnection cn;
+            private int currentRecordIndex;  
+            private int totalRecords;       
+            private DataTable currentData;   
+            private TextBox txtsnm;          
+            private TextBox txtmob;
+                       
+            public RecordNavigator(SqlConnection connection, TextBox txtStudentName, TextBox txtMobileNo)
+            {
+                cn = connection;
+                currentRecordIndex = 0;
+                currentData = new DataTable();
+                totalRecords = 0;
+                txtsnm = txtStudentName;
+                txtmob = txtMobileNo;
+       
+            }
+            private void LoadData()
+            {
+                string sql = "SELECT * FROM insertnew"; 
+                SqlDataAdapter da = new SqlDataAdapter(sql, cn);
+                currentData.Clear();  
+                da.Fill(currentData); 
+                totalRecords = currentData.Rows.Count;
+            }
+            public void Navigate()
+            {
+                if (totalRecords > 0 && currentRecordIndex < totalRecords)
+                {
+                    txtsnm.Text = currentData.Rows[currentRecordIndex]["Student_Name"].ToString();
+                    txtmob.Text = currentData.Rows[currentRecordIndex]["Mobile_No"].ToString();
+                    id = Convert.ToInt32(currentData.Rows[currentRecordIndex]["id"]);
+                }
+            }
+            public void GoToFirst()
+            {
+                currentRecordIndex = 0;
+                LoadData();
+                Navigate(); 
+            }
+            public void GoToNext()
+            {
+                if (currentRecordIndex < totalRecords - 1)
+                {
+                    currentRecordIndex++;
+                    Navigate();
+                }
+            }
+            public void GoToPrevious()
+            {
+                if (currentRecordIndex > 0)
+                {
+                    currentRecordIndex--;
+                    Navigate();  
+                }
+            }
+            public void GoToLast()
+            {
+                currentRecordIndex = totalRecords - 1;
+                Navigate();  
+            }
+        }
+     }
+    }
